@@ -9,7 +9,7 @@ const server = require(`./server`);
 Chai.use(ChaiHTTP);
 const expect = Chai.expect;
 
-describe('API routes', () => {
+describe('Routes', () => {
     const data = {
         name: 'google',
         url: 'http://google.com'
@@ -21,14 +21,13 @@ describe('API routes', () => {
         }
     });
     after(async () => {
-        await server.close();
         await urlModel.URLModel.drop();
     });
     beforeEach(async () => {});
     afterEach(async () => {});
 
     it('should GET all URLs on /api/url', async () => {
-        const response = await Chai.request(server).get('/api/url');
+        const response = await Chai.request(server).get('/api/url/');
         expect(response.type).to.equal('application/json');
         expect(response.status).to.equal(200);
         expect(response.body.status).to.equal('success');
@@ -80,5 +79,11 @@ describe('API routes', () => {
         expect(response.type).to.equal('application/json');
         expect(response.status).to.equal(500);
         expect(response.body.status).to.equal('error');
+    });
+    it('should route to url for a valid name on /:name', async () => {
+        let response = await Chai.request(server)
+            .get(`/${data.name}0`);
+        expect(response.type).to.equal('text/html');
+        expect(response.status).to.equal(200);
     });
 });

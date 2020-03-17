@@ -29,7 +29,8 @@ const findOneByNameAndIncrementHits = async (name) => {
     let foundURL = null;
     try {
         foundURL = await URL.findOne({where: {name}});
-        await foundURL.increment('hits', {by: 1});
+        await foundURL.increment('hits');
+        await foundURL.save();
         foundURL = foundURL.dataValues;
     } catch (err) {
         console.log(err);

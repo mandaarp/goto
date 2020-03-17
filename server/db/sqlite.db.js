@@ -4,7 +4,8 @@ const Sequelize = require('sequelize');
 
 const sequelize = new Sequelize({
     dialect: 'sqlite',
-    storage: appConfig.dbPath
+    storage: appConfig.dbPath,
+    logging: false
 });
 
 module.exports = {

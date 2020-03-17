@@ -1,5 +1,5 @@
 'use strict';
-
+const Router = require('express').Router();
 const URLModel = require('../models/url.model');
 
 const getAllURLs = async (req, res) => {
@@ -71,9 +71,12 @@ const deleteURL = async (req, res) => {
     }
 };
 
-module.exports = {
-    getAllURLs,
-    getURLByName,
-    createNewURL,
-    deleteURL
-};
+Router.route('/url')
+    .get(getAllURLs)
+    .post(createNewURL);
+
+Router.route('/url/:name')
+    .get(getURLByName)
+    .delete(deleteURL);
+
+module.exports = Router;
