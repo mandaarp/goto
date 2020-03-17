@@ -9,7 +9,7 @@ const dotenvMap = {
 const getEnvPath = () => {
     const devEnv = path.resolve(path.join(__dirname, '..', 'development.env'));
   if(process.env.NODE_ENV) {
-      return dotenvMap[process.env.NODE_ENV.lower()] || devEnv;
+      return dotenvMap[process.env.NODE_ENV.toLowerCase()] || devEnv;
   }
   return devEnv;
 };
