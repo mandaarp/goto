@@ -4,7 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "mocha --exit --reporter mocha-allure-reporter --exclude web-client ./**/*.test.js"
+    "test": "mocha --exit --exclude ./web-client ./**/*.test.js"
   },
   "keywords": [],
   "author": "",
