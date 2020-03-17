@@ -35,7 +35,6 @@ const findOneByNameAndIncrementHits = async (name) => {
             foundURL = foundURL.dataValues;
         }
     } catch (err) {
-        console.log(err);
     }
     return foundURL;
 };
@@ -45,7 +44,6 @@ const createOne = async (name, url) => {
       createdURL = await URL.create({name, url});
       createdURL = createdURL.dataValues;
   } catch (err) {
-      console.log(err);
   }
   return createdURL;
 };
@@ -55,7 +53,6 @@ const deleteOneByName = async name => {
     try {
         deletedURLsCount = await URL.destroy({where: {name}});
     } catch (err) {
-        console.log(err);
     }
     return deletedURLsCount;
 };
@@ -65,7 +62,7 @@ const findAllURLs = async () => {
         allURLs = await URL.findAll();
         allURLs = allURLs.map(url => url.dataValues);
     } catch (err) {
-        console.log(err);
+
     }
     return allURLs;
 };

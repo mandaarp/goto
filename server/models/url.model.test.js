@@ -29,7 +29,7 @@ describe('URLModel ', async () => {
     });
     it('should find an existing entry', async () => {
         await urlModel.URLModel.create(data);
-        const foundURL = await urlModel.URLModel.findOne(data);
+        const foundURL = await urlModel.URLModel.findOne({where: {name: data.name}});
         Chai.expect(foundURL).to.be.not.null;
         Chai.expect(foundURL).to.be.contain(data);
     });
@@ -38,7 +38,7 @@ describe('URLModel ', async () => {
         const foundURL = await urlModel.findOneByName(data.name);
         Chai.expect(foundURL).to.be.not.null;
         Chai.expect(foundURL).to.be.contain(data);
-        const incrementedHitsURL = await urlModel.URLModel.findOne(data);
+        const incrementedHitsURL = await urlModel.URLModel.findOne({where: {name: data.name}});
         Chai.expect(incrementedHitsURL).to.be.not.null;
         Chai.expect(incrementedHitsURL.hits).to.be.equal(foundURL.hits + 1);
     });
