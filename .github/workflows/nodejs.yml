@@ -11,29 +11,25 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     strategy:
       matrix:
         node-version: [10.x, 12.x]
-
     steps:
     - uses: actions/checkout@v2
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - run: npm ci
     - name: Prepare client
-      run: npm install --prefix web-client
+      run: npm install --prefix server/web-client
     - name: Build client
-      run: npm run build --prefix web-client
+      run: npm run build --prefix server/web-client
     - name: Run client e2e
-      run: npm run e2e --prefix web-client
+      run: npm run e2e --prefix server/web-client
     - name: Prepare server
-      run: npm install
+      run: npm install --prefix server
     - name: Run server tests
-      run: npm run test
+      run: npm run test --prefix server
       env:
         CI: true
