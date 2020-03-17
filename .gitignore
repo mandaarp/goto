@@ -106,3 +106,5 @@ db.sqlite
 development.env
 server/allure-results
 server/public
+allure-results
+public

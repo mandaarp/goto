@@ -1,0 +1,11 @@
+.git/
+.idea/
+.github/
+allure-results/
+node_modules/
+web-client/node_modules/
+web-client/.idea/
+web-client/build/
+web-client/coverage/
+*.sqlite
+public/
