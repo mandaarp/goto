@@ -1,0 +1,20 @@
+name: Docker Image CI
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Log into Docker Hub
+      uses: azure/docker-login@v1
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_PASSWORD }}
+    - name: Build and tag the Docker image
+      run: docker build . --file Dockerfile --tag mandaarp/goto:latest
+    - name: Push the tagged Docker image hub.docker.com
+      run: docker push mandaarp/goto:latest
