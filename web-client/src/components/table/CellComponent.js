@@ -12,6 +12,17 @@ class CellComponent extends React.Component {
         this.onFocus.bind(this);
         this.onBlur.bind(this);
     }
+    valueToString(key, value) {
+        let str = value;
+        if(key === 'createdAt' || key === 'updatedAt') {
+            str = new Date(value);
+            str = str.toLocaleString();
+        } else if(key === 'hits') {
+            str = `${value}`
+        }
+        return str;
+    }
+
     onFocus() {
         this.setState({edit: true},() => {
             if(this.inputRef.current)
@@ -44,7 +55,7 @@ class CellComponent extends React.Component {
                             if (buttons[0].key === 'delete') {
                                 return (
                                     <Button id={`${this.props.id}-button-${buttons[0].key.toLowerCase()}`}
-                                            variant="outline-danger" className={'mr-sm-2'}
+                                            variant="outline-danger" className={'mr-sm-2 form-control align-center'}
                                             onClick={() => this.props.deleteRow()}>Delete</Button>
                                 );
                             }
@@ -52,7 +63,7 @@ class CellComponent extends React.Component {
                                 return (
                                     <label id={`${this.props.id}-text-${this.props.dataKey}`} className={'text-center'}
                                            style={{display: 'block'}} onClick={() => this.onFocus()} >
-                                        {this.props.value ? this.props.value.toString() : `<${this.props.dataKey}>`}
+                                        {this.valueToString(this.props.dataKey, this.props.value)}
                                     </label>
                                 );
                         }

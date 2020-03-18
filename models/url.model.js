@@ -42,7 +42,7 @@ const findOneByNameAndIncrementHits = async (name) => {
 const createOne = async (name, url) => {
   let createdURL = null;
   try {
-      createdURL = await URL.create({name, url});
+      createdURL = await URL.create({name, url, hits: 0});
       createdURL = createdURL.dataValues;
   } catch (err) {
       console.error(err);

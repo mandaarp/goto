@@ -21,7 +21,7 @@ const COLUMNS = [
     },
     {
         key: 'updatedAt',
-        text: 'Updated',
+        text: 'Latest Hit',
         readOnly: true
     },
     {
