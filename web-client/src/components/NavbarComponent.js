@@ -14,12 +14,6 @@ class NavbarComponent extends React.Component {
             url: ''
         };
         this.createURL.bind(this);
-        this.fetchURLs.bind(this);
-    }
-    fetchURLs() {
-        fetch(config.URL_API_BASE_URL)
-            .then(response => response.json())
-            .then(data => this.props.setTableData([...data.data]));
     }
     createURL() {
         fetch(config.URL_API_BASE_URL, {
@@ -31,7 +25,13 @@ class NavbarComponent extends React.Component {
             body: JSON.stringify({name: this.state.name, url: this.state.url})
         })
             .then(response => response.json())
-            .then(data => console.log(data));
+            .then(data => {
+                if(data.status === 'error') {
+                    this.props.addAlert(data.data, 'danger');
+                } else {
+                    this.props.addAlert(`Created entry for ${data.data.name} => ${data.data.url}.`, 'success');
+                }
+            });
     }
     render() {
         return (
@@ -47,7 +47,7 @@ class NavbarComponent extends React.Component {
                     <Button id={'create-url-button'} variant="outline-success" className={'mr-sm-2'}
                             onClick={() => this.createURL()}>Create</Button>
                     <Button id={'refresh-url-table-button'} variant={'outline-primary'} className={'mr-sm-2'}
-                            onClick={() => this.fetchURLs()}>Refresh</Button>
+                            onClick={() => this.props.onRefresh()}>Refresh</Button>
                 </Form>
             </Navbar>
         );

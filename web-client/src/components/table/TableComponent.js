@@ -3,7 +3,6 @@ import RowComponent from "./RowComponent";
 import Table from "react-bootstrap/Table";
 
 class TableComponent extends React.Component {
-
     render() {
         return (
             <div>
@@ -27,6 +26,7 @@ class TableComponent extends React.Component {
                             return (
                                 <RowComponent id={`${this.props.id}-row-${index}`} key={index} index={index}
                                               data={element} columns={this.props.columns}
+                                              deleteRow={() => this.props.deleteRow(index)}
                                               rowChanged={(i, newValue) => this.props.onRowChange(i, newValue)}/>
                             );
                         })

@@ -24,6 +24,7 @@ class RowComponent extends React.Component {
                         return (
                             <CellComponent id={`${this.props.id}-cell-${column.key}`} key={column.key} dataKey={column.key}
                                            value={this.state[column.key]} readonly={column.readOnly}
+                                           index={this.props.index} deleteRow={() => this.props.deleteRow()}
                                            onChange={(e, key) => this.onChange(e, key)} onBlur={() => this.onBlur()}/>
                             );
                     })

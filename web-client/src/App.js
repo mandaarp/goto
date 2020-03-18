@@ -4,6 +4,7 @@ import NavbarComponent from "./components/NavbarComponent";
 import AlertComponent from "./components/notifications/AlertComponent";
 import TableComponent from "./components/table/TableComponent";
 import {COLUMNS} from './components/table/config';
+import * as config from "./app.config";
 
 class App extends React.Component {
     constructor(props) {
@@ -15,6 +16,8 @@ class App extends React.Component {
         this.addAlert.bind(this);
         this.removeAlert.bind(this);
         this.setTableData.bind(this);
+        this.deleteRow.bind(this);
+        this.fetchURLs.bind(this);
     }
 
     addAlert(text, type, disappearIn=5000) {
@@ -44,17 +47,57 @@ class App extends React.Component {
         });
     }
 
+    fetchURLs() {
+        fetch(config.URL_API_BASE_URL)
+            .then(response => response.json())
+            .then(data => {
+                if(data.status === 'error') {
+                    this.addAlert(data.data, 'danger');
+                } else {
+                    this.setTableData([...data.data]);
+                    this.addAlert(`Fetched ${data.data.length} entries.`, 'success');
+                }
+            });
+    }
     setTableData(newTableData) {
         const tableData = [...newTableData];
+        tableData.forEach(e => e.actions = [{
+            key: 'delete',
+            onClick: this.deleteRow
+        }]);
         this.setState({tableData: []});
         this.setState({tableData});
     }
+
+    deleteRow(index) {
+        fetch(`${config.URL_API_BASE_URL}${this.state.tableData[index].name}`, {
+            method: 'DELETE',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if(data.status === 'error') {
+                    this.addAlert(`Failed to delete the entry for ${this.state.tableData[index].name} => 
+                    ${this.state.tableData[index].url}`, 'danger');
+                } else {
+                    this.addAlert(`Deleted the entry for ${this.state.tableData[index].name} => 
+                    ${this.state.tableData[index].url}`, 'success');
+                }
+                this.fetchURLs();
+            });
+    }
+
     render() {
         return (
             <div className="container-fluid">
-                <NavbarComponent setTableData={tableData => this.setTableData(tableData)}/>
+                <NavbarComponent addAlert={(text, type) => this.addAlert(text, type)} onRefresh={() => this.fetchURLs()}/>
                 <div id={'alerts-div'}>{this.showAlerts()}</div>
-                <TableComponent id={'urls-table'} columns={COLUMNS} data={this.state.tableData}/>
+                <TableComponent id={'urls-table'} columns={COLUMNS} data={this.state.tableData}
+                                deleteRow={index => this.deleteRow(index)}
+                />
             </div>
         );
     }

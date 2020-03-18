@@ -23,6 +23,11 @@ const COLUMNS = [
         key: 'updatedAt',
         text: 'Updated',
         readOnly: true
+    },
+    {
+        key: 'actions',
+        text: 'Actions',
+        readOnly: true
     }
 ];
 module.exports = {

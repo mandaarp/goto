@@ -100,4 +100,8 @@ describe('Homepage', () => {
         const html = await page.$('#urls-table-head-hits', e => e);
         Chai.expect(html).to.be.not.null;
     });
+    it('should display actions column in url table', async () => {
+        const html = await page.$('#urls-table-head-actions', e => e);
+        Chai.expect(html).to.be.not.null;
+    });
 });

@@ -58,7 +58,6 @@ describe('URL', () => {
             },
             userAgent: ''
         });
-        await retry(() => page.goto(gotoURL), 10);
     });
 
     after(async () => {
@@ -68,6 +67,7 @@ describe('URL', () => {
 
     beforeEach(async () => {
         await urlModel.sync({force: true});
+        await retry(() => page.goto(gotoURL), 10);
     });
 
     afterEach(async () => {
@@ -118,5 +118,18 @@ describe('URL', () => {
         await page.waitForSelector(`#hplogo`);
         const actual = await page.$eval(`#hplogo`, e => e.alt);
         Chai.expect(actual.toLowerCase()).to.be.equal('google');
+    });
+
+    it('should delete existing entry for a given name', async () => {
+        await typeInput('#name-text', sampleData[0].name);
+        await typeInput('#url-text', sampleData[0].url);
+        await page.click(`#create-url-button`);
+        await sleep(100);
+        await page.click(`#refresh-url-table-button`);
+        await sleep(100);
+        await page.click(`#urls-table-row-0-cell-actions-button-delete`);
+        await sleep(100);
+        const actual = await page.$(`#urls-table-row-0-cell-name-text-name`);
+        Chai.expect(actual).to.be.null;
     });
 });
