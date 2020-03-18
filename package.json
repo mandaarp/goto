@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "test": "NODE_ENV=test mocha --exit tests/**/*.test.js",
-    "test:integration": "NODE_ENV=test mocha --exit ./integration-tests/**/*.test.js"
+    "deploy:client": "npm run build:prod --prefix web-client && rm -rf ./public && mv ./web-client/build ./public",
+    "test:integration": "npm run deploy:client && NODE_ENV=test mocha --exit ./integration-tests/**/*.test.js"
   },
   "keywords": [],
   "author": "",
