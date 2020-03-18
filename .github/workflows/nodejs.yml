@@ -25,6 +25,8 @@ jobs:
       run: npm install --prefix web-client
     - name: Build client
       run: npm run build --prefix web-client
+    - name: Build production client for integration tests
+      run: npm run build:prod --prefix web-client
     - name: Run client e2e
       run: npm run e2e --prefix web-client
     - name: Prepare server
