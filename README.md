@@ -28,7 +28,7 @@ steps:
                 proxy_set_header X-Real-IP $remote_addr;
                 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
                 proxy_set_header X-NginX-Proxy true;
-                proxy_pass http://192.168.8.3:8010/;
+                proxy_pass http://<your_ip_address>:8000/;
                 proxy_ssl_session_reuse off;
                 proxy_set_header Host $http_host;
                 proxy_cache_bypass $http_upgrade;
@@ -39,6 +39,7 @@ steps:
              }
         }
      }
+10. Update `<your_ip_address>` field in `nginx.conf` to your system's IP address e.g. `192.168.1.11`.
 10. Run `docker container create --name nginx -p 80:80 -v ${PWD}/nginx.conf:/etc/nginx/nginx.conf:ro nginx`
 11. Add following line to your `/etc/hosts`(Mac and Linux) or `C:\Windows\System32\drivers\etc\hosts` file:
     ```
