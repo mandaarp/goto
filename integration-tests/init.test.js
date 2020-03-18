@@ -1,33 +1,26 @@
 const puppeteer = require('puppeteer');
-const forever = require('forever-monitor');
 const Chai = require('chai');
+const childProcess = require('child_process');
+
 
 describe('Homepage', () => {
     let browser = null;
     let page = null;
     let serverInstance = null;
+    const port = 3010;
+    const gotoURL = `http://localhost:${port}`;
+    const sampleData = [{
+        name: 'g',
+        url: 'https://www.google.com'
+    }, {
+        name: 'y',
+        url: 'https://www.yahoo.com'
+    }];
     let startServer = async () => {
-        serverInstance = new (forever.Monitor)(`server.js`, {
-            watch: false,
-            silent: true,
-            args: [],
-            cwd: `${__dirname}/../`,
-            env: {
-                'NODE_ENV': 'test'
-            },
-            sourceDir: `${__dirname}/../`
-        });
-        serverInstance.on('start', info => {
-            console.log(`Server started...`);
-        });
-        serverInstance.on('exit', function () {
-            console.log('Server is stopped.');
-        });
-        return serverInstance.start();
-
+        serverInstance = childProcess.spawn('node', ['server.js'], {detached: true});
     };
     let stopServer = async () => {
-        await serverInstance.stop();
+        process.kill(serverInstance.pid);
     };
     let sleep = async ms => new Promise(resolve => setTimeout(resolve, ms));
     let retry = async (promiseFactory, retryCount) => {
@@ -56,10 +49,10 @@ describe('Homepage', () => {
             },
             userAgent: ''
         });
-        await retry(() => page.goto(`http://localhost:3010/`), 10);
+        await retry(() => page.goto(gotoURL), 10);
     });
     after(async () => {
-        browser.close();
+        await browser.close();
         await stopServer();
     });
 

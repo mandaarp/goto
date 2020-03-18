@@ -4,7 +4,7 @@ const Fs = require('fs');
 const Ini = require('ini');
 const Chai = require('chai');
 
-const appConfig = require(`${__dirname}/app.config`);
+const appConfig = require(`${__dirname}/../config/app.config`);
 const ENV_PATH = appConfig.getEnvPath();
 
 Chai.should();

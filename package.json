@@ -4,8 +4,8 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "NODE_ENV=test mocha --exit --exclude [./web-client, ./integration-tests] ./**/*.test.js",
-    "integration": "NODE_ENV=test mocha --exit ./integration-tests/**/*.test.js"
+    "test": "NODE_ENV=test mocha --exit tests/**/*.test.js",
+    "test:integration": "NODE_ENV=test mocha --exit ./integration-tests/**/*.test.js"
   },
   "keywords": [],
   "author": "",
@@ -14,7 +14,6 @@
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
-    "epilogue": "^0.7.1",
     "express": "^4.17.1",
     "sequelize": "^5.21.5",
     "sqlite3": "^4.1.1"
@@ -22,10 +21,8 @@
   "devDependencies": {
     "chai": "^4.2.0",
     "chai-http": "^4.3.0",
-    "forever-monitor": "^2.0.0",
     "mocha": "^7.1.0",
     "mocha-allure-reporter": "^1.4.0",
-    "nodemon": "^2.0.2",
     "puppeteer": "^2.1.1"
   }
 }

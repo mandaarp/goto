@@ -1,8 +1,9 @@
 'use strict';
 
 const puppeteer = require('puppeteer');
-const forever = require('forever-monitor');
 const Chai = require('chai');
+const childProcess = require('child_process');
+const urlModel = require(`../models/url.model`).URLModel;
 
 Chai.use(require('chai-http'));
 
@@ -10,7 +11,8 @@ describe('URL', () => {
     let browser = null;
     let page = null;
     let serverInstance = null;
-    const gotoURL = 'http://localhost:3010';
+    const port = 3010;
+    const gotoURL = `http://localhost:${port}`;
     const sampleData = [{
         name: 'g',
         url: 'https://www.google.com'
@@ -19,27 +21,10 @@ describe('URL', () => {
         url: 'https://www.yahoo.com'
     }];
     let startServer = async () => {
-        serverInstance = new (forever.Monitor)(`server.js`, {
-            watch: false,
-            silent: true,
-            args: [],
-            cwd: `${__dirname}/../`,
-            env: {
-                'NODE_ENV': 'test'
-            },
-            sourceDir: `${__dirname}/../`
-        });
-        serverInstance.on('start', info => {
-            console.log(`Server started...`);
-        });
-        serverInstance.on('exit', function () {
-            console.log('Server is stopped.');
-        });
-        return serverInstance.start();
-
+        serverInstance = childProcess.spawn('node', ['server.js'], {detached: true});
     };
     let stopServer = async () => {
-        await serverInstance.stop();
+        process.kill(serverInstance.pid);
     };
     let sleep = async ms => new Promise(resolve => setTimeout(resolve, ms));
     let retry = async (promiseFactory, retryCount) => {
@@ -53,6 +38,11 @@ describe('URL', () => {
             await sleep(1000);
             return await retry(promiseFactory, retryCount - 1);
         }
+    };
+    const typeInput = async (selector, text) => {
+        const input = await page.$(selector);
+        await input.click({clickCount: 3});
+        await input.type(text);
     };
 
     before(async () => {
@@ -70,43 +60,63 @@ describe('URL', () => {
         });
         await retry(() => page.goto(gotoURL), 10);
     });
+
     after(async () => {
-        browser.close();
+        await browser.close();
         await stopServer();
+    });
+
+    beforeEach(async () => {
+        await urlModel.sync({force: true});
+    });
+
+    afterEach(async () => {
+        await urlModel.drop();
     });
 
     it('should create a new entry', async () => {
         const expectedData = sampleData[0];
-        await page.type(`#name-text`, expectedData.name);
-        await page.type(`#url-text`, expectedData.url);
+        await typeInput('#name-text', expectedData.name);
+        await typeInput('#url-text', expectedData.url);
         await page.click(`#create-url-button`);
         const allURLs = await Chai.request(gotoURL).get('/api/url');
         const found = allURLs.body.data.find(e => e.name === expectedData.name);
         Chai.expect(found).to.be.not.null;
         Chai.expect(found.name).to.be.equal(expectedData.name);
         Chai.expect(found.url).to.be.equal(expectedData.url);
-        await Chai.request(gotoURL).delete(`api/url/?${expectedData.name}`);
     });
 
     it('should fetch all entries', async () => {
-        sampleData.forEach(async e => {
-            await page.type(`#name-text`, e.name);
-            await page.type(`#url-text`, e.url);
+        for(let index = 0; index < sampleData.length; ++index) {
+            await typeInput('#name-text', sampleData[index].name);
+            await typeInput('#url-text', sampleData[index].url);
             await page.click(`#create-url-button`);
-        });
+            await sleep(100);
+        }
         await page.click(`#refresh-url-table-button`);
-        sampleData.forEach(async (e, i) => {
-            let actual = await page.$(`#urls-table-row-${i}-name-text-name`);
-            Chai.expect(actual).to.be.equal(e.name);
-            actual = await page.$(`#urls-table-row-${i}-url-text-url`);
-            Chai.expect(actual).to.be.equal(e.url);
-            actual = await page.$(`#urls-table-row-${i}-hits-text-hits`);
-            Chai.expect(actual).to.be.equal(0);
-            actual = await page.$(`#urls-table-row-${i}-createdAt-text-createdAt`);
+        for(let index = 0; index < sampleData.length; ++index) {
+            await page.waitForSelector(`#urls-table-row-${index}-cell-name-text-name`, {});
+            let actual = await page.$eval(`#urls-table-row-${index}-cell-name-text-name`, e => e.textContent);
+            Chai.expect(actual.trim()).to.be.equal(sampleData[index].name);
+            actual = await page.$eval(`#urls-table-row-${index}-cell-url-text-url`, e => e.textContent);
+            Chai.expect(actual.trim()).to.be.equal(sampleData[index].url);
+            actual = await page.$eval(`#urls-table-row-${index}-cell-hits-text-hits`, e => e.textContent);
             Chai.expect(actual).to.be.not.null;
-            actual = await page.$(`#urls-table-row-${i}-updatedAt-text-updatedAt`);
+            actual = await page.$eval(`#urls-table-row-${index}-cell-createdAt-text-createdAt`, e => e.textContent);
             Chai.expect(actual).to.be.not.null;
-            await Chai.request(gotoURL).delete(`api/url/?${e.name}`);
-        });
+            actual = await page.$eval(`#urls-table-row-${index}-cell-updatedAt-text-updatedAt`, e => e.textContent);
+            Chai.expect(actual).to.be.not.null;
+        }
+    });
+
+    it('should redirect to specified URL from name', async () => {
+        await typeInput('#name-text', sampleData[0].name);
+        await typeInput('#url-text', sampleData[0].url);
+        await page.click(`#create-url-button`);
+        await sleep(100);
+        await page.goto(`${gotoURL}/${sampleData[0].name}`);
+        await page.waitForSelector(`#hplogo`);
+        const actual = await page.$eval(`#hplogo`, e => e.alt);
+        Chai.expect(actual.toLowerCase()).to.be.equal('google');
     });
 });
